@@ -1,0 +1,87 @@
+Voici d'autres fonctions courantes et utiles dans MySQL-async (utilisé avec FiveM) qui peuvent être comparées à MySQL.scalar.await, MySQL.query, et MySQL.update :
+
+1. MySQL.insert.await
+
+Type: Asynchrone, similaire à MySQL.scalar.await, mais utilisé pour les inserts dans la base de données.
+
+Usage principal: Utilisé pour insérer des données dans une table et récupérer l'ID généré de la ligne insérée, souvent utilisé pour des colonnes auto-incrémentées.
+
+Retour: Retourne l'ID de la ligne insérée (généralement un entier), ou nil si l'insertion a échoué.
+
+
+Exemple d'utilisation :
+
+local newId = MySQL.insert.await('INSERT INTO player_keys (identifier, vehicle_plate, has_key) VALUES (@identifier, @vehicle_plate, @has_key)', {
+    ['@identifier'] = xPlayer.identifier,
+    ['@vehicle_plate'] = vehiclePlate,
+    ['@has_key'] = true
+})
+
+if newId then
+    print("New key inserted with ID: " .. newId)
+else
+    print("Failed to insert new key.")
+end
+
+2. MySQL.fetchAll.await
+
+Type: Asynchrone avec await, utilisée pour récupérer plusieurs résultats (lignes) dans une table.
+
+Usage principal: Récupérer un ensemble de résultats pour une requête de sélection qui retourne plusieurs lignes.
+
+Retour: Retourne un tableau d'enregistrements (une table) avec toutes les lignes correspondant à la requête.
+
+
+Exemple d'utilisation :
+
+local results = MySQL.fetchAll.await('SELECT * FROM player_keys WHERE identifier = @identifier', {
+    ['@identifier'] = xPlayer.identifier
+})
+
+if results then
+    for _, row in ipairs(results) do
+        print("Vehicle Plate: " .. row.vehicle_plate)
+    end
+else
+    print("No keys found.")
+end
+
+3. MySQL.fetchScalar.await
+
+Type: Asynchrone avec await, similaire à MySQL.scalar.await, mais utilisé spécifiquement pour récupérer un seul champ à partir de plusieurs résultats.
+
+Usage principal: Utilisé pour récupérer un champ particulier à partir d'un seul résultat. Par exemple, cela peut être utile lorsque vous souhaitez récupérer une valeur spécifique d'une table.
+
+
+Exemple d'utilisation :
+
+local hasKey = MySQL.fetchScalar.await('SELECT has_key FROM player_keys WHERE identifier = @identifier AND vehicle_plate = @vehicle_plate', {
+    ['@identifier'] = xPlayer.identifier,
+    ['@vehicle_plate'] = vehiclePlate
+})
+
+if hasKey then
+    print("Player has the key.")
+else
+    print("Player doesn't have the key.")
+end
+
+Comparaison des fonctions :
+
+Résumé des fonctions :
+
+MySQL.query : Utilisé pour des requêtes génériques (INSERT, UPDATE, DELETE, SELECT) avec un callback pour traiter les résultats.
+
+MySQL.scalar.await : Récupère une seule valeur d'une requête de manière synchrone.
+
+MySQL.update : Utilisé pour effectuer des mises à jour de données dans la base de données avec un callback pour gérer les résultats.
+
+MySQL.insert.await : Utilisé pour insérer une nouvelle ligne dans la base de données et retourner l'ID de la ligne insérée.
+
+MySQL.fetchAll.await : Utilisé pour récupérer toutes les lignes résultantes d'une requête SQL de sélection.
+
+MySQL.fetchScalar.await : Similaire à MySQL.scalar.await, mais utilisé pour récupérer un champ spécifique d'une ligne de résultats.
+
+
+En résumé, ces fonctions permettent une gestion souple et puissante des interactions avec la base de données MySQL dans FiveM, en facilitant les opérations courantes comme les mises à jour, les insertions, les récupérations de valeurs uniques ou multiples.
+
