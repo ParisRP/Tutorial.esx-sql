@@ -1,0 +1,74 @@
+Voici une autre comparaison plus détaillée et complémentaire de MySQL.query et MySQL.scalar.await dans le contexte de FiveM et ESX :
+
+1. MySQL.query
+
+Type: Asynchrone, utilise un callback.
+
+Usage principal: Exécuter des requêtes SQL générales où vous ne souhaitez pas forcément récupérer un résultat spécifique, ou quand le résultat n'est pas crucial pour le flux principal de votre code.
+
+Retour: Le résultat est retourné via un callback une fois la requête terminée, permettant de gérer le résultat une fois l'opération SQL terminée.
+
+Scénarios d'utilisation:
+
+Insertion ou mise à jour de données dans la base.
+
+Suppression de données.
+
+Exécution d'une opération qui ne nécessite pas de résultat immédiat.
+
+
+
+Exemple:
+
+MySQL.query('INSERT INTO player_keys (identifier, vehicle_plate, has_key) VALUES (@identifier, @vehicle_plate, @has_key)', {
+    ['@identifier'] = xPlayer.identifier,
+    ['@vehicle_plate'] = vehiclePlate,
+    ['@has_key'] = true
+}, function(result)
+    print("Key inserted successfully!")
+end)
+
+Utilisé pour ajouter une clé pour un joueur, sans nécessiter de valeur de retour immédiate.
+
+
+2. MySQL.scalar.await
+
+Type: Synchronous avec await, retourne une seule valeur.
+
+Usage principal: Récupérer une seule valeur ou un champ de la base de données. Cette méthode est plus simple à utiliser lorsque vous avez besoin d'une seule donnée (comme un nombre ou une valeur booléenne) dans votre code sans passer par un callback.
+
+Retour: Un seul résultat, directement retourné sous forme de valeur (en utilisant await), ce qui permet d'écrire du code plus linéaire sans avoir besoin d'un callback.
+
+Scénarios d'utilisation:
+
+Vérification de la présence d'une donnée spécifique.
+
+Récupération d'un seul champ ou d'une valeur dans la base de données, comme la vérification de si un joueur possède une clé.
+
+
+
+Exemple:
+
+local hasKey = MySQL.scalar.await('SELECT has_key FROM player_keys WHERE identifier = @identifier AND vehicle_plate = @vehicle_plate', {
+    ['@identifier'] = xPlayer.identifier,
+    ['@vehicle_plate'] = vehiclePlate
+})
+
+if hasKey then
+    print("Player has the key.")
+else
+    print("Player doesn't have the key.")
+end
+
+Utilisé pour vérifier si un joueur possède une clé pour un véhicule en récupérant directement la valeur du champ has_key.
+
+
+Comparaison détaillée:
+
+Conclusion:
+
+MySQL.query est plus généraliste et utile pour les opérations où vous n'avez pas besoin de gérer un seul résultat immédiatement, mais plutôt plusieurs résultats ou des opérations sans retour direct.
+
+MySQL.scalar.await simplifie la récupération de valeurs uniques et permet un code plus propre, notamment pour des requêtes qui retournent une seule donnée (comme un champ booléen ou une clé primaire).
+
+
